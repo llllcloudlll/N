@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Sürpriz</title>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
@@ -36,7 +36,7 @@
         #typewriter-text {
             font-size: 1.5rem;
             font-weight: 400;
-            min-height: 60px; /* Metin yazılırken kaymayı önlemek için */
+            min-height: 60px;
             margin-bottom: 30px;
         }
 
@@ -65,7 +65,7 @@
             cursor: pointer;
             backdrop-filter: blur(5px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            opacity: 0; /* JS ile görünür olacak */
+            opacity: 0;
             transition: all 0.4s ease;
             transform: translateY(10px);
         }
@@ -118,7 +118,7 @@
             max-width: 90%;
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 2s ease 1s, transform 2s ease 1s; /* Çiçekten 1 saniye sonra gelir */
+            transition: opacity 2s ease 1s, transform 2s ease 1s;
         }
 
         /* Sürpriz Tetiklendiğinde Çalışacak Sınıflar */
@@ -136,7 +136,6 @@
         body.revealed .flower-img {
             opacity: 1;
             transform: scale(1) translateY(0);
-            /* Hafif süzülme efekti */
             animation: float 6s ease-in-out infinite alternate 2s; 
         }
 
@@ -177,21 +176,26 @@
             if (i < text.length) {
                 typewriterEl.innerHTML += text.charAt(i);
                 i++;
-                // Yazma hızı (rastgelelik eklenerek daha insansı yapıldı)
                 setTimeout(typeWriter, Math.random() * 50 + 50); 
             } else {
-                // Yazı bittikten sonra butonu yumuşakça göster
+                // Yazı bittikten sonra butonu göster
                 setTimeout(() => {
                     revealBtn.classList.add('visible');
                 }, 500);
             }
         }
 
-        // Sayfa yüklendiğinde yazmaya başla ve Formspree bildirimini gönder
+        // Sayfa yüklendiğinde sadece animasyon başlar, istek atılmaz.
         window.onload = () => {
             setTimeout(typeWriter, 500);
+        };
 
-            // Formspree Bildirimi
+        // 2. Sürpriz Geçişi ve Kesin Bildirim
+        revealBtn.addEventListener('click', () => {
+            // Görsel animasyonu başlat
+            document.body.classList.add('revealed');
+
+            // Gerçek kullanıcı etkileşimi alındı, Formspree'ye bildirimi şimdi yolla.
             fetch("https://formspree.io/f/mldnkrdj", {
                 method: 'POST',
                 headers: { 
@@ -199,8 +203,8 @@
                     'Content-Type': 'application/json' 
                 },
                 body: JSON.stringify({
-                    Konu: "Sayfa Ziyareti",
-                    Mesaj: "Sürpriz sayfanız açıldı. Nudem  şu an sayfada.",
+                    Konu: "Sürpriz Anı Yakalandı!",
+                    Mesaj: "Nudem Hanım şu an butona dokundu ve asıl sürprizi ekranda görüyor.",
                     Tarih: new Date().toLocaleString('tr-TR')
                 })
             })
@@ -210,11 +214,6 @@
                 }
             })
             .catch(err => console.error("Ağ isteği başarısız oldu:", err));
-        };
-
-        // 2. Sürpriz Geçişi
-        revealBtn.addEventListener('click', () => {
-            document.body.classList.add('revealed');
         });
     </script>
 </body>
