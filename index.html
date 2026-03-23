@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden;
+            color: #4a4a4a;
+        }
+
+        /* --- İlk Ekran (Samimi Karşılama) --- */
+        #intro-container {
+            text-align: center;
+            padding: 20px;
+            transition: opacity 1s ease, transform 1s ease;
+            z-index: 10;
+            position: absolute;
+        }
+
+        #typewriter-text {
+            font-size: 1.5rem;
+            font-weight: 400;
+            min-height: 60px; /* Metin yazılırken kaymayı önlemek için */
+            margin-bottom: 30px;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: #4a4a4a;
+            vertical-align: middle;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .action-btn {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.1rem;
+            padding: 12px 35px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #e0caca;
+            color: #6d5b5b;
+            border-radius: 50px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            opacity: 0; /* JS ile görünür olacak */
+            transition: all 0.4s ease;
+            transform: translateY(10px);
+        }
+
+        .action-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            box-shadow: 0 8px 25px rgba(220, 150, 150, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* --- İkinci Ekran (Sürpriz ve Çiçek) --- */
+        #flower-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 5;
+            transition: opacity 1.5s ease;
+        }
+
+        /* Gerçekçi çiçek animasyonu */
+        .flower-img {
+            max-width: 85%;
+            max-height: 55vh;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
+            transform: scale(0.6) translateY(30px);
+            opacity: 0;
+            transition: transform 2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.5s ease;
+        }
+
+        .personal-quote {
+            font-family: 'Caveat', cursive;
+            font-size: 2.8rem;
+            color: #5c4747;
+            margin-top: 30px;
+            text-align: center;
+            max-width: 90%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 2s ease 1s, transform 2s ease 1s; /* Çiçekten 1 saniye sonra gelir */
+        }
+
+        /* Sürpriz Tetiklendiğinde Çalışacak Sınıflar */
+        body.revealed #intro-container {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        body.revealed #flower-container {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        body.revealed .flower-img {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            /* Hafif süzülme efekti */
+            animation: float 6s ease-in-out infinite alternate 2s; 
+        }
+
+        body.revealed .personal-quote {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-15px) scale(1.02); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="intro-container">
+        <div id="text-wrapper">
+            <span id="typewriter-text"></span><span class="cursor"></span>
+        </div>
+        <button id="reveal-btn" class="action-btn">Bir dokunuş yeterli...</button>
+    </div>
+
+    <div id="flower-container">
+        <img src="https://images.unsplash.com/photo-1563241527-3004b7be0ffd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Çiçek" class="flower-img">
+        <div class="personal-quote">"Bu çiçekler, yeryüzündeki asıl ve en güzel çiçeğe..."</div>
+    </div>
+
+    <script>
+        // 1. Daktilo (Typewriter) Efekti
+        const text = "Nudem Hanım, umarım keyfiniz yerindedir...";
+        const typewriterEl = document.getElementById('typewriter-text');
+        const revealBtn = document.getElementById('reveal-btn');
+        let i = 0;
+
+        function typeWriter() {
+            if (i < text.length) {
+                typewriterEl.innerHTML += text.charAt(i);
+                i++;
+                // Yazma hızı (rastgelelik eklenerek daha insansı yapıldı)
+                setTimeout(typeWriter, Math.random() * 50 + 50); 
+            } else {
+                // Yazı bittikten sonra butonu yumuşakça göster
+                setTimeout(() => {
+                    revealBtn.classList.add('visible');
+                }, 500);
+            }
+        }
+
+        // Sayfa yüklendiğinde yazmaya başla ve Formspree bildirimini gönder
+        window.onload = () => {
+            setTimeout(typeWriter, 500);
+
+            // Formspree Bildirimi
+            fetch("https://formspree.io/f/mldnkrdj", {
+                method: 'POST',
+                headers: { 
+                    'Accept': 'application/json', 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({
+                    Konu: "Sayfa Ziyareti",
+                    Mesaj: "Sürpriz sayfanız açıldı. Nudem  şu an sayfada.",
+                    Tarih: new Date().toLocaleString('tr-TR')
+                })
+            })
+            .then(response => {
+                if(!response.ok) {
+                    console.error("Formspree sunucu hatası döndürdü. Durum kodu:", response.status);
+                }
+            })
+            .catch(err => console.error("Ağ isteği başarısız oldu:", err));
+        };
+
+        // 2. Sürpriz Geçişi
+        revealBtn.addEventListener('click', () => {
+            document.body.classList.add('revealed');
+        });
+    </script>
+</body>
+</html>
