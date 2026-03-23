@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Ufak Bir Sürpriz</title>
+    
+    <meta name="description" content="Sizin için ufak bir sürpriz var.">
+    
+    <meta property="og:title" content="Özel Bir Sürpriz">
+    <meta property="og:description" content="Sizin için ufak bir sürpriz hazırladım.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Özel Bir Sürpriz">
+    <meta name="twitter:description" content="Sizin için ufak bir sürpriz hazırladım.">
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
@@ -98,8 +106,8 @@
             transition: opacity 1.5s ease;
         }
 
-        /* Gerçekçi çiçek animasyonu */
-        .flower-img {
+        /* Gerçekçi çiçek animasyonu (JavaScript ile eklenecek) */
+        .flower-img-styled {
             max-width: 85%;
             max-height: 55vh;
             object-fit: contain;
@@ -133,7 +141,7 @@
             opacity: 1;
         }
 
-        body.revealed .flower-img {
+        body.revealed .flower-img-styled {
             opacity: 1;
             transform: scale(1) translateY(0);
             animation: float 6s ease-in-out infinite alternate 2s; 
@@ -157,12 +165,11 @@
         <div id="text-wrapper">
             <span id="typewriter-text"></span><span class="cursor"></span>
         </div>
-        <button id="reveal-btn" class="action-btn">Butona bas</button>
+        <button id="reveal-btn" class="action-btn">Bir dokunuş yeterli...</button>
     </div>
 
     <div id="flower-container">
-        <img src="https://images.unsplash.com/photo-1563241527-3004b7be0ffd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Çiçek" class="flower-img">
-        <div class="personal-quote">"Bu çiçekler, yeryüzündeki asıl ve en güzel çiçeğe..."</div>
+        <div id="personal-quote-wrapper" class="personal-quote">"Bu çiçekler, yeryüzündeki asıl ve en güzel çiçeğe..."</div>
     </div>
 
     <script>
@@ -192,8 +199,26 @@
 
         // 2. Sürpriz Geçişi ve Kesin Bildirim
         revealBtn.addEventListener('click', () => {
-            // Görsel animasyonu başlat
+            // Animasyonu başlat
             document.body.classList.add('revealed');
+
+            // --- DEĞİŞİKLİK BURADA: Çiçek Resmini JavaScript ile Dinamik Olarak Ekle ---
+            // Bu sayede link tarayıcı botlar resmi bulamaz.
+            const flowerContainer = document.getElementById('flower-container');
+            const personalQuoteWrapper = document.getElementById('personal-quote-wrapper');
+            
+            // Eğer resim zaten eklenmemişse ekle (mükerrer istekleri engellemek için)
+            if (!document.getElementById('flower-img-added')) {
+                const flowerImg = document.createElement('img');
+                flowerImg.src = "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+                flowerImg.alt = "Çiçek";
+                flowerImg.className = "flower-img-styled"; // CSS stilini uygula
+                flowerImg.id = "flower-img-added"; // ID atayarak kontrol sağla
+                
+                // Resmi yazının hemen önüne ekle
+                flowerContainer.insertBefore(flowerImg, personalQuoteWrapper);
+            }
+            // -----------------------------------------------------------------------
 
             // Gerçek kullanıcı etkileşimi alındı, Formspree'ye bildirimi şimdi yolla.
             fetch("https://formspree.io/f/mldnkrdj", {
